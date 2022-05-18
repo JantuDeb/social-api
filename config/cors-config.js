@@ -1,6 +1,6 @@
 const corsConFig = {
   origin: [
-    "http://localhost:3000","https://ionvu-connect.netlify.app"
+    "http://localhost:3000","https://ionvuconnect.netlify.app/"
   ],
   credentials: true,
 };
