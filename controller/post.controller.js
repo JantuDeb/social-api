@@ -42,7 +42,59 @@ exports.addPost = async (req, res) => {
       videoURL,
     });
     const populatedPost = await post.populate("user", "name photo location");
-    res.status(201).send({ success: true, post:populatedPost });
+    res.status(201).send({ success: true, post: populatedPost });
+  } catch (error) {
+    res.status(500).send({ success: false, message: error.message });
+  }
+};
+exports.updatePost = async (req, res) => {
+  const { description = "", tags = [] } = req.body;
+  const { postId } = req.params;
+  if (!description)
+    return res
+      .status(400)
+      .send({ success: false, message: "Please write something" });
+
+  try {
+    let imageResponse = {};
+    let videoResponse = {};
+    if (req.files?.image) {
+      imageResponse = await cloudinary.v2.uploader.upload(
+        req.files.image.tempFilePath,
+        { folder: "post/image" }
+      );
+    }
+
+    if (req.files?.video) {
+      videoResponse = await cloudinary.v2.uploader.upload(
+        req.files.video.tempFilePath,
+        { folder: "post/video", resource_type: "video" }
+      );
+    }
+
+    const image = {
+      id: imageResponse.public_id,
+      url: imageResponse.secure_url,
+    };
+    const videoURL = {
+      id: videoResponse.public_id,
+      url: videoResponse.secure_url,
+    };
+
+    const postObj = {
+      description,
+      image,
+      tags,
+      videoURL,
+    };
+    console.log(postObj);
+    if(postObj.image.url === undefined) delete postObj.image
+    if(postObj.videoURL.url===undefined) delete postObj.videoURL
+    console.log(postObj);
+
+    const post = await Post.findByIdAndUpdate({_id:postId},postObj, {new:true}).populate("user", "name photo location");
+
+    res.status(201).send({ success: true, post });
   } catch (error) {
     res.status(500).send({ success: false, message: error.message });
   }

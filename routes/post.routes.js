@@ -7,6 +7,7 @@ const {
   deletePost,
   getUserFeed,
   getPostsByUser,
+  updatePost,
 } = require("../controller/post.controller");
 
 const isAuthenticated = require("../middleware/isAuthenticated");
@@ -22,6 +23,7 @@ router.route("/posts/:userId").get(isAuthenticated, getPostsByUser)
 router
   .route("/post/:postId")
   .get(isAuthenticated, getPost)
+  .put(isAuthenticated, updatePost)
   .patch(isAuthenticated, updateViewCount)
   .delete(isAuthenticated, deletePost);
 

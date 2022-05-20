@@ -14,7 +14,7 @@ exports.signup = async (req, res) => {
   if (!email || !name || !password || !username)
     return res
       .status(400)
-      .json({ success: false, errror: "Name, email and password are requied" });
+      .json({ success: false, message: "Name, email and password are requied" });
 
   if (req.files) {
     let file = req.files.photo;
@@ -37,10 +37,7 @@ exports.signup = async (req, res) => {
       },
     });
   } catch (error) {
-    const message =
-      error.code === 11000 && error.keyValue.email
-        ? "User already registerd"
-        : "Something went wrong";
+    const message =error.message.replace("User validation failed:","");
     return res.status(400).send({ success: false, message });
   }
 
@@ -57,7 +54,7 @@ exports.login = async (req, res) => {
   if (!email || !password) {
     return res
       .status(400)
-      .json({ success: false, errror: "Email and password are requied" });
+      .json({ success: false, message: "Email and password are requied" });
   }
 
   try {
