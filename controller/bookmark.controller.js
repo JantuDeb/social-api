@@ -8,12 +8,13 @@ exports.addToBookmark = async (req, res) => {
         .status(409)
         .send({ success: false, message: "Already in bookmark" });
     const bookmark = await Bookmark.create({ user: req.userId, post: postId });
-    if (!bookmark)
+    const populatedBookmark = await bookmark.populate("post")
+    if (!populatedBookmark)
       return res
         .status(400)
         .send({ success: false, message: "Failed to create bookmark" });
 
-    res.status(200).send({ success: true, bookmark });
+    res.status(200).send({ success: true, bookmark:populatedBookmark });
   } catch (error) {
     res.status(500).send({ success: false, message: error.message });
   }

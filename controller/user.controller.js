@@ -12,9 +12,10 @@ exports.signup = async (req, res) => {
   let result;
   const { name, email, password, username } = req.body;
   if (!email || !name || !password || !username)
-    return res
-      .status(400)
-      .json({ success: false, message: "Name, email and password are requied" });
+    return res.status(400).json({
+      success: false,
+      message: "Name, email and password are requied",
+    });
 
   if (req.files) {
     let file = req.files.photo;
@@ -37,7 +38,7 @@ exports.signup = async (req, res) => {
       },
     });
   } catch (error) {
-    const message =error.message.replace("User validation failed:","");
+    const message = error.message.replace("User validation failed:", "");
     return res.status(400).send({ success: false, message });
   }
 
@@ -245,6 +246,10 @@ exports.updateUserPassword = async (req, res) => {
 //update user
 exports.updateUserDetails = async (req, res) => {
   const { name, email, bio, website, location } = req.body;
+  let newUrl;
+  if (!website.startsWith("http")) {
+    newUrl = "https://" + website;
+  } else newUrl = website;
 
   try {
     const user = await User.findById(req.userId);
@@ -302,7 +307,7 @@ exports.updateUserDetails = async (req, res) => {
         photo: photo.id ? photo : user.photo,
         banner: banner.id ? banner : user.banner,
         bio,
-        website,
+        website: newUrl,
         location,
       },
       { new: true }
@@ -475,7 +480,7 @@ exports.searchUsers = async (req, res) => {
   try {
     const users = await User.find({
       name: {
-        $regex: new RegExp(".*"+username+".*", "i"),
+        $regex: new RegExp(".*" + username + ".*", "i"),
       },
     });
     res.send({ success: true, users });
